@@ -25,7 +25,9 @@ import javax.swing.table.TableModel;
 
 /**
  *
- * @author pmreid
+ * @author pmreid Some icons from
+ * <a href="https://www.flaticon.com/free-icons/document" title="document icons">Document
+ * icons created by vectorsmarket15 - Flaticon</a>
  */
 public class MainWindow extends javax.swing.JFrame {
 
@@ -115,6 +117,7 @@ public class MainWindow extends javax.swing.JFrame {
         jTextFieldOutputPDF.setEditable(false);
         jTextFieldOutputPDF.setToolTipText("Use the 'Choose...' button to select the output file");
 
+        jButtonChooseOutputPDF.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/reid/pdfjoiner/icons/icon_open.png"))); // NOI18N
         jButtonChooseOutputPDF.setText("Choose...");
         jButtonChooseOutputPDF.setToolTipText("Choose the destination PDF to output the merged content to.");
         jButtonChooseOutputPDF.addActionListener(new java.awt.event.ActionListener() {
@@ -145,7 +148,8 @@ public class MainWindow extends javax.swing.JFrame {
         jTableSourceFiles.setShowGrid(true);
         jScrollPaneSourceTable.setViewportView(jTableSourceFiles);
 
-        jButtonMoveUp.setText("Move Up");
+        jButtonMoveUp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/reid/pdfjoiner/icons/icon_up2.png"))); // NOI18N
+        jButtonMoveUp.setText("Move Up    ");
         jButtonMoveUp.setToolTipText("Moves the currently-selected file 'up' the order of files to merge.");
         jButtonMoveUp.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -153,6 +157,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        jButtonMoveDown.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/reid/pdfjoiner/icons/icon_down2.png"))); // NOI18N
         jButtonMoveDown.setText("Move Down");
         jButtonMoveDown.setToolTipText("Moves the currently selected file down the order");
         jButtonMoveDown.addActionListener(new java.awt.event.ActionListener() {
@@ -161,7 +166,8 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
-        jButtonRemove.setText("Remove File");
+        jButtonRemove.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/reid/pdfjoiner/icons/icon_remove.png"))); // NOI18N
+        jButtonRemove.setText("Remove      ");
         jButtonRemove.setToolTipText("Removes the currently-selected file from the source file list");
         jButtonRemove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -169,6 +175,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        jButtonAddSourceFiles.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/reid/pdfjoiner/icons/icon_folders2.png"))); // NOI18N
         jButtonAddSourceFiles.setText("Add Source File(s)...");
         jButtonAddSourceFiles.setToolTipText("Provides a dialog to select one or more source files to add to the list.");
         jButtonAddSourceFiles.addActionListener(new java.awt.event.ActionListener() {
@@ -177,6 +184,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        jButtonJoinPDFs.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/reid/pdfjoiner/icons/icon_save.png"))); // NOI18N
         jButtonJoinPDFs.setText("Join PDFs!");
         jButtonJoinPDFs.setToolTipText("Executes the 'join' cycle and merges the source files in the list, in order, to make the output file.");
         jButtonJoinPDFs.setDoubleBuffered(true);
@@ -193,54 +201,49 @@ public class MainWindow extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabelSourceFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabelOutputPDF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(jButtonAddSourceFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 213, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButtonJoinPDFs, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jScrollPaneSourceTable, javax.swing.GroupLayout.PREFERRED_SIZE, 1097, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jTextFieldOutputPDF, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jLabelSourceFiles, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabelOutputPDF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jButtonAddSourceFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButtonJoinPDFs, javax.swing.GroupLayout.PREFERRED_SIZE, 250, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jTextFieldOutputPDF)
+                    .addComponent(jScrollPaneSourceTable, javax.swing.GroupLayout.DEFAULT_SIZE, 1097, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButtonChooseOutputPDF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButtonMoveUp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButtonMoveDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jButtonRemove, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButtonChooseOutputPDF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(29, 29, 29))
+                    .addComponent(jButtonMoveDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jButtonChooseOutputPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabelOutputPDF)
-                        .addComponent(jTextFieldOutputPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(21, 21, 21)
+                .addComponent(jLabelOutputPDF)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonChooseOutputPDF, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jTextFieldOutputPDF))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabelSourceFiles)
+                .addGap(9, 9, 9)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPaneSourceTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(jLabelSourceFiles)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButtonMoveUp, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButtonMoveUp, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButtonRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jButtonRemove, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButtonMoveDown, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(64, 64, 64)
-                        .addComponent(jScrollPaneSourceTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(26, 26, 26)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButtonAddSourceFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButtonJoinPDFs, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(26, Short.MAX_VALUE))
+                        .addComponent(jButtonMoveDown, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButtonJoinPDFs, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButtonAddSourceFiles, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(19, 19, 19))
         );
 
         pack();
@@ -272,18 +275,25 @@ public class MainWindow extends javax.swing.JFrame {
 
     private void jButtonJoinPDFsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonJoinPDFsActionPerformed
         if (readyToMerge()) {
-            if (PDFJoiner.executeJoin()) {
-                // success
-                if (PDFJoiner.outputYesNoQuestionToUser("The merged PDF was successfully created. Would you like to view the new PDF file?", "Success. View new PDF?")) {
-                    PDFJoiner.pdfMan.loadPDFToView();
-                    System.exit(0);
-                } else {
-                    System.exit(0);
+            PDFJoiner.processingFrame.setVisible(true);
+            Thread joinerThread = new Thread(new Runnable() {
+                public void run() {
+
+                    if (PDFJoiner.executeJoin()) {
+                        // success
+                        if (PDFJoiner.outputYesNoQuestionToUser("The merged PDF was successfully created. Would you like to view the new PDF file?", "Success. View new PDF?")) {
+                            PDFJoiner.pdfMan.loadPDFToView();
+                            System.exit(0);
+                        } else {
+                            System.exit(0);
+                        }
+                    } else {
+                        // failure
+                        System.exit(1);
+                    }
                 }
-            } else {
-                // failure
-                System.exit(1);
-            }
+            });
+            joinerThread.start();
         } else {
             PDFJoiner.outputExceptionToUser(new Exception("Not all informaiton such as source and destination have been set. Cannot start the merge process."));
         }

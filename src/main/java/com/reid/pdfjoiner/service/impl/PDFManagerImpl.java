@@ -17,14 +17,13 @@
 package com.reid.pdfjoiner.service.impl;
 
 import com.reid.pdfjoiner.PDFJoiner;
+import com.reid.pdfjoiner.primitive.ConversionResult;
+import com.reid.pdfjoiner.service.DocDetectorConverter;
 import com.reid.pdfjoiner.service.PDFManager;
 import java.awt.Desktop;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.pdfbox.io.IOUtils;
 import org.apache.pdfbox.io.RandomAccessStreamCache;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
@@ -43,21 +42,37 @@ public class PDFManagerImpl implements PDFManager {
         boolean status = false;
         PDFMergerUtility pmu = new PDFMergerUtility();
         pmu.setDestinationFileName(dest.getAbsolutePath());
-
-        sources.forEach(file -> {
+        int sourceCount = 0;
+        DocDetectorConverter converter = new DocDetectorConverterImpl();
+        for (File file : sources) {
             try {
-                pmu.addSource(file);
-            } catch (FileNotFoundException e) {
+                if (converter.checkFileIsPDF(file)) {
+                    pmu.addSource(file);
+                    sourceCount++;
+                } else {
+                    //not a PDF... check for possible conversion...
+                    ConversionResult result = converter.attemptConversion(file);
+
+                    if (!result.isSuccess()) {
+                        // conversion failed...
+                    } else {
+                        pmu.addSource(result.getTempFile());
+                        sourceCount++;
+                    }
+                }
+            } catch (Exception e) {
                 PDFJoiner.outputExceptionToUser(e);
             }
-        });
+        }
 
-        RandomAccessStreamCache.StreamCacheCreateFunction streamCache = IOUtils.createMemoryOnlyStreamCache();
-        try {
-            pmu.mergeDocuments(streamCache);
-            status = true;
-        } catch (IOException ex) {
-            PDFJoiner.outputExceptionToUser(ex);
+        if (sourceCount > 0) {
+            RandomAccessStreamCache.StreamCacheCreateFunction streamCache = IOUtils.createMemoryOnlyStreamCache();
+            try {
+                pmu.mergeDocuments(streamCache);
+                status = true;
+            } catch (IOException ex) {
+                PDFJoiner.outputExceptionToUser(ex);
+            }
         }
         return status;
     }
@@ -78,20 +93,30 @@ public class PDFManagerImpl implements PDFManager {
     /*
     A series of helper methods to determine which OS is in use:
      */
-    private boolean isWindows() {
+    @Override
+    public boolean isWindows() {
         return (OS.indexOf("win") >= 0);
     }
 
-    private boolean isMac() {
+    @Override
+    public boolean isMac() {
         return (OS.indexOf("mac") >= 0);
     }
 
-    private boolean isUnix() {
+    @Override
+    public boolean isUnix() {
         return (OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0);
     }
 
-    private boolean isSolaris() {
+    @Override
+    public boolean isSolaris() {
         return (OS.indexOf("sunos") >= 0);
+    }
+
+    @Override
+    public File convertDocument(File f) {
+        return null;
+
     }
 
 }

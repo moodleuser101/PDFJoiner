@@ -26,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -41,10 +44,13 @@ public class PDFJoiner {
     public static MainWindow mw;
     public static List<File> sourceFiles;
     public static File destinationFile;
-    private static final String SUFFIX = "pdf";
+    public static final String SUFFIX = "pdf";
     public static PDFManager pdfMan;
     public static final int DIR_UP = 1;
     public static final int DIR_DOWN = -1;
+    // PDF should work on all platforms; PPTX, PPT, DOC, DOCX will only work in a MS Windows environment with MS Office installed
+    public static final List<String> source_extensions = Arrays.asList("pdf", "pptx", "ppt", "doc", "docx");
+    public static JFrame processingFrame;
 
     /**
      * The main method is the entry point to this program.
@@ -53,6 +59,15 @@ public class PDFJoiner {
      */
     public static void main(String[] args) {
         initializeSettings();
+        // multiple threads will be needed to split the GUI from the actual joiner, else GUI lag results:
+        Thread pFrame = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                initProcessingWindow();
+            }
+        });
+        pFrame.start();
+
         PDFJoiner.sourceFiles = new ArrayList<>();
         pdfMan = new PDFManagerImpl();
         mw = new MainWindow();
@@ -71,13 +86,19 @@ public class PDFJoiner {
         if (destinationFile.getParentFile().canWrite() && !sourceFiles.isEmpty()) {
             for (File f : sourceFiles) {
                 if (f.exists() && f.canRead()) {
-                    return pdfMan.joinPDFs(destinationFile, sourceFiles);
+                    status = pdfMan.joinPDFs(destinationFile, sourceFiles);
                 } else {
-                    PDFJoiner.outputExceptionToUser(new Exception("One or more source files cannot be read."));
+                    processingFrame.dispose();
+                    PDFJoiner.outputExceptionToUser(new Exception("One or more source files cannot be read: " + f.getAbsolutePath()));
                 }
             }
+
         } else {
+            processingFrame.dispose();
             PDFJoiner.outputExceptionToUser(new Exception("Destination file unwritable or source files list empty."));
+        }
+        if (processingFrame.isActive()) {
+            processingFrame.dispose();
         }
         return status;
     }
@@ -127,12 +148,18 @@ public class PDFJoiner {
      * @return Absolute path of desired output file
      */
     public static String selectOutputFile() {
-        destinationFile = PDFJoiner.fileBrowse("Select Source PDF", FileDialog.SAVE, PDFJoiner.SUFFIX, false)[0]; // show dialog to select output file
-        if (destinationFile == null) {
+        try {
+            destinationFile = PDFJoiner.fileBrowse("Select output PDF", FileDialog.SAVE, false)[0];
+            // show dialog to select output file
+            if (destinationFile == null) {
+                PDFJoiner.outputExceptionToUser(new Exception("Cancel was clicked on destination file selection; it will not be possible to proceed until an output file is selected..."));
+                return null;
+            } else {
+                return destinationFile.getAbsolutePath();
+            }
+        } catch (NullPointerException ex) {
             PDFJoiner.outputExceptionToUser(new Exception("Cancel was clicked on destination file selection; it will not be possible to proceed until an output file is selected..."));
             return null;
-        } else {
-            return destinationFile.getAbsolutePath();
         }
     }
 
@@ -143,15 +170,33 @@ public class PDFJoiner {
      */
     public static boolean selectSourceFiles() {
         List<File> newSourceFiles;
-        newSourceFiles = Arrays.asList(PDFJoiner.fileBrowse("Select Source PDF", FileDialog.LOAD, ".pdf", true)); // show dialog to select source file
-        if (newSourceFiles == null) {
-            PDFJoiner.outputExceptionToUser(new Exception("Cancel was clicked on source files selection; it will not be possible to proceed until a source is selected..."));
-            return false;
-        } else {
-            // merge the existing list of source files with these new ones
-            PDFJoiner.sourceFiles.addAll(newSourceFiles);
-            return true;
+        try {
+            String title;
+            if (pdfMan.isWindows()) {
+                /*
+                The Microsoft Word and Microsoft Excel covnersion methods rely on native MS Office installation, which will only be available in Windows
+                 */
+                title = "Select Source files (PDF, PowerPoint, Word, etc)";
+            } else {
+                title = "Select source PDFs";
+            }
+            newSourceFiles = Arrays.asList(PDFJoiner.fileBrowse(title, FileDialog.LOAD, true)); // show dialog to select source file
+            if (newSourceFiles == null) {
+                cancelClicked();
+                return false;
+            } else {
+                // merge the existing list of source files with these new ones
+                PDFJoiner.sourceFiles.addAll(newSourceFiles);
+                return true;
+            }
+        } catch (NullPointerException ex) {
+            cancelClicked();
         }
+        return false;
+    }
+
+    private static void cancelClicked() {
+        PDFJoiner.outputExceptionToUser(new Exception("Cancel was clicked on source files selection; it will not be possible to proceed until a source is selected..."));
     }
 
     public static void removeFileFromSources(File f) {
@@ -204,21 +249,33 @@ public class PDFJoiner {
      * and no star
      * @return Java File reference
      */
-    private static File[] fileBrowse(String dialogTitle, int dialogType, String fileFilter, boolean multipleSelect) {
+    private static File[] fileBrowse(String dialogTitle, int dialogType, boolean multipleSelect) {
         try {
             FileDialog fileDialog = new FileDialog(new Frame(), dialogTitle, dialogType);
             fileDialog.setDirectory(System.getProperty("user.home"));
             fileDialog.setMultipleMode(multipleSelect);
-            String fileFilter2;
-            if (!fileFilter.contains(".")) {
-                fileFilter2 = "." + fileFilter;
-            } else {
-                fileFilter2 = fileFilter;
-            }
             fileDialog.setFilenameFilter(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(fileFilter2);
+                    boolean acceptable = false;
+                    if (dialogType == FileDialog.SAVE) {
+                        if (name.toLowerCase().endsWith("." + PDFJoiner.SUFFIX)) {
+                            acceptable = true;
+                        }
+                    } else {
+                        if (pdfMan.isWindows()) {
+                            for (String extension : PDFJoiner.source_extensions) {
+                                if (name.toLowerCase().endsWith("." + extension)) {
+                                    acceptable = true;
+                                }
+                            }
+                        } else {
+                            if (name.toLowerCase().endsWith("." + PDFJoiner.SUFFIX)) {
+                                acceptable = true;
+                            }
+                        }
+                    }
+                    return acceptable;
                 }
             });
             fileDialog.setVisible(true);
@@ -228,8 +285,8 @@ public class PDFJoiner {
             if (files != null && files.length > 0) {
                 for (int i = 0; i < files.length; i++) {
                     String fn = files[i].getName();
-                    if (!fn.endsWith(fileFilter)) {
-                        fn = fn + "." + fileFilter;
+                    if (!fn.toLowerCase().endsWith(PDFJoiner.SUFFIX) && dialogType == FileDialog.SAVE) {
+                        fn = fn + "." + PDFJoiner.SUFFIX;
                     }
                     processedFiles[i] = new File(fileDialog.getDirectory(), fn);
                 }
@@ -250,7 +307,7 @@ public class PDFJoiner {
      */
     private static void triggerExit(String msg) {
         PDFJoiner.outputExceptionToUser(new Exception(msg));
-        System.exit(0);
+        System.exit(1);
     }
 
     /**
@@ -267,5 +324,27 @@ public class PDFJoiner {
             PDFJoiner.outputExceptionToUser(ex);
         }
         System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); // prevents superfluous logging by Apache PDFBox
+    }
+
+    /**
+     * Displays a pop-up window to user to signify that batch job is running
+     */
+    private static void initProcessingWindow() {
+        if (PDFJoiner.processingFrame == null) {
+            PDFJoiner.processingFrame = new JFrame();
+        }
+        processingFrame.setAlwaysOnTop(true);
+        processingFrame.setAutoRequestFocus(true);
+        processingFrame.setResizable(false);
+        processingFrame.setUndecorated(true);
+        processingFrame.setSize(400, 300);
+        processingFrame.setLocationRelativeTo(null);
+        ImageIcon loading = new ImageIcon(PDFJoiner.class
+                .getResource("/com/reid/pdfjoiner/icons/loading.gif"));
+        // loading image courtesy of https://tenor.com/en-GB/view/loading-gif-26545612
+        processingFrame.add(new JLabel(" processing...", loading, JLabel.CENTER));
+        /*
+        Hat-tip https://stackoverflow.com/questions/7634402/creating-a-nice-loading-animation
+         */
     }
 }
